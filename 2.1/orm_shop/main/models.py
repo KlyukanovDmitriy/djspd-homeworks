@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Client(models.Model):
@@ -46,8 +47,26 @@ DRIVE_UNIT_CHOICES = (
 
 
 class Car(models.Model):
-    pass  # реализуйте модель
+    model = models.CharField(max_length=50)
+    year = models.IntegerField(validators=[MaxValueValidator(2025),MinValueValidator(1900)])
+    color = models.CharField(max_length=20)
+    mileage = models.PositiveIntegerField()
+    volume = models.DecimalField(max_digits = 2, decimal_places = 1)
+    body_type = models.CharField(max_length = 20, choices = BODY_TYPE_CHOICES)
+    drive_unit = models.CharField(max_length = 20, choices = DRIVE_UNIT_CHOICES)
+    gearbox = models.CharField(max_length = 20, choices = GEARBOX_CHOICES)
+    fuel_type = models.CharField(max_length = 20, choices = FUEL_TYPE_CHOICES)
+    price = models.PositiveIntegerField()
+    image = models.ImageField(upload_to='images', blank=True, null=True)
 
+    def __str__(self):
+        return f'{self.model}'
 
 class Sale(models.Model):
-    pass  # реализуйте модель
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Продана {self.car} клиенту {self.client} {self.created_at}'
+
